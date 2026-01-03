@@ -1,0 +1,42 @@
+.idea/
+*.iml
+out/
+
+######################################
+# Java / Build artifacts
+######################################
+*.class
+target/
+build/
+
+######################################
+# Logs
+######################################
+logs/
+*.log
+
+######################################
+# Spring Boot config (environment-specific)
+######################################
+application-local.yml
+application-local.yaml
+application-local.properties
+application-dev.yml
+application-dev.yaml
+application-dev.properties
+
+######################################
+# Secrets & credentials (never commit)
+######################################
+*.jks
+*.keystore
+*.p12
+*.pem
+*.crt
+*.key
+
+######################################
+# OS junk
+######################################
+.DS_Store
+Thumbs.db
