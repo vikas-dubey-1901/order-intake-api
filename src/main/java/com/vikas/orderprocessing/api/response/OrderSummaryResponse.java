@@ -5,21 +5,13 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.time.Instant;
-import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 @Getter
 @Builder
-public class OrderResponse {
+public class OrderSummaryResponse {
     private UUID orderId;
-    private OrderType orderType;
-    private OrderChannel channel;
-    private String customerId;
     private OrderStatus status;
-    private String currency;
-    private List<OrderItemResponse> items;
-    private Map<String, String> metadata;
+    private String customerId;
     private Instant createdAt;
-    private Instant updatedAt;
 }
