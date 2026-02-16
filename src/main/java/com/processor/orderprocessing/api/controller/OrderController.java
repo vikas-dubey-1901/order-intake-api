@@ -2,14 +2,24 @@ package com.processor.orderprocessing.api.controller;
 
 import com.processor.orderprocessing.api.mapper.OrderApiMapper;
 import com.processor.orderprocessing.api.request.CreateOrderRequest;
-import com.processor.orderprocessing.api.response.OrderResponse;
+import com.processor.orderprocessing.api.response.*;
 import com.processor.orderprocessing.application.OrderProcessingUseCase;
+import com.processor.orderprocessing.application.OrderSearchCriteria;
+import com.processor.orderprocessing.application.command.CancelOrderCommand;
+import com.processor.orderprocessing.application.command.CreateOrderCommand;
+import com.processor.orderprocessing.application.result.OrderResult;
+import com.processor.orderprocessing.application.view.OrderHistoryView;
+import com.processor.orderprocessing.application.view.OrderView;
+import com.processor.orderprocessing.application.view.PagedOrderView;
+import com.processor.orderprocessing.domain.domainEnum.OrderChannel;
+import com.processor.orderprocessing.domain.domainEnum.OrderStatus;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Instant;
 import java.util.UUID;
 
 @RestController
@@ -25,9 +35,9 @@ public class OrderController {
             @RequestHeader("X-Request-Id") String requestId,
             @RequestHeader("X-Correlation-Id") String correlationId,
             @RequestHeader("X-Client-Id") String clientId,
-            @Valid @RequestBody CreateOrderRequest request){
+            @Valid @RequestBody CreateOrderRequest request) {
 
-        CreateOrderCommand command =  orderApiMapper.toCreateOrderCommand(
+        CreateOrderCommand command = orderApiMapper.toCreateOrderCommand(
                 requestId,
                 correlationId,
                 clientId,
@@ -38,8 +48,7 @@ public class OrderController {
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(orderApiMapper, toCreateOrderResponse(result));
-
+                .body(orderApiMapper.toCreateOrderResponse(result));
     }
 
     @GetMapping
@@ -112,8 +121,4 @@ public class OrderController {
                 orderApiMapper.toOrderHistoryResponse(history)
         );
     }
-
-    
-
-
 }

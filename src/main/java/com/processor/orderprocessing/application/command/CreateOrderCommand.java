@@ -1,5 +1,7 @@
-package com.processor.orderprocessing.api.mapper;
+package com.processor.orderprocessing.application.command;
 
+import com.processor.orderprocessing.domain.domainEnum.OrderChannel;
+import com.processor.orderprocessing.domain.domainEnum.OrderType;
 import com.processor.orderprocessing.domain.model.OrderItem;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,10 +17,11 @@ public class CreateOrderCommand {
     private String correlationId;
     private String clientId;
 
-    private OrderType orderType;
     private OrderChannel channel;
+    OrderType orderType;
     private String customerId;
     private List<OrderItem> items;
     private String currency;
     private Map<String, String> metadata;
+
 }

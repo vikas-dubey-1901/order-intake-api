@@ -55,7 +55,7 @@ public class OrderEntity {
     )
     private List<OrderItemEntity> items = new ArrayList<>();
 
-    static OrderEntity fromDomain(
+    public static OrderEntity fromDomain(
             UUID id,
             OrderType orderType,
             OrderChannel channel,
@@ -77,7 +77,7 @@ public class OrderEntity {
         return entity;
     }
 
-    void addItem(OrderItemEntity item) {
+    public void addItem(OrderItemEntity item) {
         items.add(item);
         item.setOrder(this);
     }

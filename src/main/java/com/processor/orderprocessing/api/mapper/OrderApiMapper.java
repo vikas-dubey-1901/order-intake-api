@@ -3,7 +3,9 @@ package com.processor.orderprocessing.api.mapper;
 import com.processor.orderprocessing.api.request.CreateOrderRequest;
 import com.processor.orderprocessing.api.request.OrderItemRequest;
 import com.processor.orderprocessing.api.response.*;
-import com.vikas.orderprocessing.api.response.*;
+import com.processor.orderprocessing.application.command.CreateOrderCommand;
+import com.processor.orderprocessing.application.result.OrderResult;
+import com.processor.orderprocessing.application.view.*;
 import com.processor.orderprocessing.domain.model.OrderItem;
 import org.springframework.stereotype.Component;
 
@@ -11,6 +13,10 @@ import java.util.List;
 
 @Component
 public class OrderApiMapper {
+
+    /* ============================
+       REQUEST → COMMAND
+       ============================ */
 
     public CreateOrderCommand toCreateOrderCommand(
             String requestId,
@@ -22,8 +28,8 @@ public class OrderApiMapper {
                 requestId,
                 correlationId,
                 clientId,
-                request.getOrderType(),
                 request.getChannel(),
+                request.getOrderType(),
                 request.getCustomerId(),
                 mapItems(request.getItems()),
                 request.getCurrency(),
@@ -31,36 +37,16 @@ public class OrderApiMapper {
         );
     }
 
+    /* ============================
+       RESULT → RESPONSE
+       ============================ */
+
     public CreateOrderResponse toCreateOrderResponse(OrderResult result) {
-        // implementation
-    }
-
-    public OrderResponse toOrderResponse(OrderView view) {
-        return OrderResponse.builder()
-                .orderId(view.getOrderId())
-                .orderType(view.getOrderType())
-                .channel(view.getChannel())
-                .customerId(view.getCustomerId())
-                .status(view.getStatus())
-                .currency(view.getCurrency())
-                .items(mapItemResponses(view.getItems()))
-                .metadata(view.getMetadata())
-                .createdAt(view.getCreatedAt())
-                .updatedAt(view.getUpdatedAt())
-                .build();
-    }
-
-    public PagedOrderResponse toPagedOrderResponse(PagedOrderView view) {
-        return PagedOrderResponse.builder()
-                .page(view.getPage())
-                .size(view.getSize())
-                .totalElements(view.getTotalElements())
-                .orders(
-                        view.getOrders().stream()
-                                .map(this::toOrderSummary)
-                                .toList()
-                )
-                .build();
+        return new CreateOrderResponse(
+                result.getOrderId(),
+                result.getStatus().name(),
+                result.getMessage()
+        );
     }
 
     public CancelOrderResponse toCancelOrderResponse(OrderResult result) {
@@ -71,7 +57,41 @@ public class OrderApiMapper {
         );
     }
 
-    public OrderHistoryResponse toOrderHistoryResponse(OrderHistoryView view) {
+    /* ============================
+       VIEW → RESPONSE
+       ============================ */
+
+    public OrderResponse toOrderResponse(OrderView view) {
+        return OrderResponse.builder()
+                .orderId(view.getOrderId())
+                .orderType(view.getOrderType())
+                .channel(view.getChannel())
+                .customerId(view.getCustomerId())
+                .status(view.getStatus())
+                .currency(view.getCurrency())
+                .items(mapItemResponses(view.getItems()))
+                .createdAt(view.getCreatedAt())
+                .updatedAt(view.getUpdatedAt())
+                .build();
+    }
+
+    public PagedOrderResponse toPagedOrderResponse(PagedOrderView view) {
+        return PagedOrderResponse.builder()
+                .page(view.getPage())
+                .size(view.getSize())
+                .totalElements(view.getTotalElements())
+                .totalPages(view.getTotalPages())
+                .orders(
+                        view.getOrders().stream()
+                                .map(this::toOrderSummary)
+                                .toList()
+                )
+                .build();
+    }
+
+    public OrderHistoryResponse toOrderHistoryResponse(
+            OrderHistoryView view
+    ) {
         return OrderHistoryResponse.builder()
                 .orderId(view.getOrderId())
                 .history(
@@ -81,6 +101,10 @@ public class OrderApiMapper {
                 )
                 .build();
     }
+
+    /* ============================
+       PRIVATE HELPERS
+       ============================ */
 
     private OrderSummaryResponse toOrderSummary(OrderSummaryView view) {
         return OrderSummaryResponse.builder()
@@ -111,13 +135,12 @@ public class OrderApiMapper {
                 .toList();
     }
 
-    private OrderStatusEntry toStatusEntry(OrderStatusView view) {
-        return OrderStatusEntry.builder()
+    private OrderStatusEntryResponse toStatusEntry(
+            OrderStatusEntryView view
+    ) {
+        return OrderStatusEntryResponse.builder()
                 .status(view.getStatus())
-                .timestamp(view.getTimestamp())
+                .timestamp(view.getChangedAt())
                 .build();
     }
-
-
-
 }

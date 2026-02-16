@@ -12,5 +12,6 @@ public class PagedOrderResponse {
     private int page;
     private int size;
     private long totalElements;
+    private int totalPages;
     private List<OrderSummaryResponse> orders;
 }

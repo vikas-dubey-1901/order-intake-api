@@ -5,12 +5,14 @@ import com.processor.orderprocessing.domain.domainEnum.OrderStatus;
 import com.processor.orderprocessing.domain.domainEnum.OrderType;
 import com.processor.orderprocessing.domain.exception.InvalidOrderStateException;
 import com.processor.orderprocessing.domain.exception.OrderValidationException;
+import lombok.Getter;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
+@Getter
 public class Order {
 
     private final UUID id;
@@ -24,6 +26,8 @@ public class Order {
 
     private  Instant createdAt;
     private Instant updatedAt;
+
+    private List<OrderStatusHistory> statusHistory;
 
     private Order(
             UUID id,
@@ -105,6 +109,7 @@ public class Order {
             );
         }
         this.status = OrderStatus.CANCELLED;
+        recordStatusChange(this.status);
         touch();
     }
 
@@ -117,6 +122,13 @@ public class Order {
                 .map(OrderItem::lineTotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
+
+    private void recordStatusChange(OrderStatus status) {
+        this.statusHistory.add(
+                new OrderStatusHistory(status, Instant.now())
+        );
+    }
+
 
 
 }

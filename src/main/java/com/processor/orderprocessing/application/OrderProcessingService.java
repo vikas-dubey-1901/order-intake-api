@@ -1,9 +1,20 @@
 package com.processor.orderprocessing.application;
 
+import com.processor.orderprocessing.application.command.CancelOrderCommand;
+import com.processor.orderprocessing.application.command.CreateOrderCommand;
+import com.processor.orderprocessing.application.event.OutboxEvent;
+import com.processor.orderprocessing.application.exception.DuplicateRequestException;
+import com.processor.orderprocessing.application.port.OrderRepository;
+import com.processor.orderprocessing.application.port.ProcessedRequestRepository;
+import com.processor.orderprocessing.application.port.OutboxRepository;
+import com.processor.orderprocessing.application.result.OrderResult;
+import com.processor.orderprocessing.application.view.OrderHistoryView;
+import com.processor.orderprocessing.application.view.OrderView;
+import com.processor.orderprocessing.application.view.PagedOrderView;
+import com.processor.orderprocessing.domain.exception.OrderNotFoundException;
 import com.processor.orderprocessing.domain.model.Order;
-import com.processor.orderprocessing.outbox.repository.OutboxRepository;
-import com.processor.orderprocessing.persistence.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,7 +23,8 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class OrderProcessingService implements OrderProcessingUseCase{
+public class OrderProcessingService implements OrderProcessingUseCase {
+
     private final OrderRepository orderRepository;
     private final ProcessedRequestRepository processedRequestRepository;
     private final OrderValidator orderValidator;
@@ -21,36 +33,27 @@ public class OrderProcessingService implements OrderProcessingUseCase{
     @Override
     public OrderResult process(CreateOrderCommand command) {
 
-        // 1. Idempotency
         if (processedRequestRepository.exists(command.getRequestId())) {
             throw new DuplicateRequestException(command.getRequestId());
         }
 
-        // 2. Convert command → domain
         Order order = Order.create(
                 command.getOrderType(),
                 command.getChannel(),
                 command.getCustomerId(),
                 command.getItems(),
-                command.getCurrency(),
-                command.getMetadata()
-        );
+                command.getCurrency());
 
-        // 3. Business validation
         orderValidator.validate(order);
 
-        // 4. Persist order
         Order savedOrder = orderRepository.save(order);
 
-        // 5. Mark request as processed
         processedRequestRepository.save(command.getRequestId());
 
-        // 6. Create outbox event
         outboxRepository.save(
                 OutboxEvent.orderReceived(savedOrder)
         );
 
-        // 7. Return result
         return OrderResult.success(
                 savedOrder.getId(),
                 savedOrder.getStatus(),
@@ -76,6 +79,7 @@ public class OrderProcessingService implements OrderProcessingUseCase{
 
         return PagedOrderView.from(page);
     }
+
 
     @Override
     public OrderResult cancel(CancelOrderCommand command) {

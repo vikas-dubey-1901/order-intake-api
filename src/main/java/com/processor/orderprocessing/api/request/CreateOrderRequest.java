@@ -1,5 +1,7 @@
 package com.processor.orderprocessing.api.request;
 
+import com.processor.orderprocessing.domain.domainEnum.OrderChannel;
+import com.processor.orderprocessing.domain.domainEnum.OrderType;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;

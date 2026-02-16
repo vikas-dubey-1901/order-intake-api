@@ -11,5 +11,5 @@ import java.util.UUID;
 public class OrderHistoryResponse {
 
     private UUID orderId;
-    private List<OrderStatusEntry> history;
+    private List<OrderStatusEntryResponse> history;
 }

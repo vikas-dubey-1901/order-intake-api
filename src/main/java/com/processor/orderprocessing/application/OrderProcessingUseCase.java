@@ -1,6 +1,11 @@
 package com.processor.orderprocessing.application;
 
-import com.processor.orderprocessing.api.mapper.CreateOrderCommand;
+import com.processor.orderprocessing.application.command.CancelOrderCommand;
+import com.processor.orderprocessing.application.command.CreateOrderCommand;
+import com.processor.orderprocessing.application.result.OrderResult;
+import com.processor.orderprocessing.application.view.OrderHistoryView;
+import com.processor.orderprocessing.application.view.OrderView;
+import com.processor.orderprocessing.application.view.PagedOrderView;
 
 import java.util.UUID;
 

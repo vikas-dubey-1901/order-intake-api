@@ -1,6 +1,8 @@
 package com.processor.orderprocessing.api.response;
 
+import com.processor.orderprocessing.domain.domainEnum.OrderChannel;
 import com.processor.orderprocessing.domain.domainEnum.OrderStatus;
+import com.processor.orderprocessing.domain.domainEnum.OrderType;
 import lombok.Builder;
 import lombok.Getter;
 

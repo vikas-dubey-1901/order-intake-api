@@ -30,7 +30,7 @@ public class OrderItemEntity {
     @JoinColumn(name = "order_id", nullable = false)
     private OrderEntity order;
 
-    static OrderItemEntity fromDomain(
+    public static OrderItemEntity fromDomain(
             String productId,
             int quantity,
             BigDecimal unitPrice
