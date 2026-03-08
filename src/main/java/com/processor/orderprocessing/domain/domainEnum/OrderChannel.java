@@ -1,4 +1,8 @@
 package com.processor.orderprocessing.domain.domainEnum;
 
-public class OrderChannel {
+public enum OrderChannel {
+
+    WEB,
+    MOBILE,
+    STORE
 }

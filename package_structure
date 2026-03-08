@@ -1,0 +1,42 @@
+api/
+  controller/
+  request/
+  response/
+  mapper/
+  exception/
+
+application/
+  command/
+  result/
+  view/
+  query/
+  port/
+  exception/
+  OrderProcessingService
+  OrderProcessingUseCase
+
+domain/
+  model/
+  domainEnum/
+  exception/
+
+persistence/
+  entity/
+  repository/ (JpaRepository only)
+  adapter/ (implements ports)
+  mapper/
+
+outbox/
+  entity/
+  repository/ (JpaRepository)
+  adapter/ (implements port)
+  publisher/
+
+messaging/
+  producer/
+  consumer/
+  event/
+  mapper/
+
+config/
+util/

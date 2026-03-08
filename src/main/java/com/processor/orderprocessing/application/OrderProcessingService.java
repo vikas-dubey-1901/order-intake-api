@@ -1,5 +1,6 @@
 package com.processor.orderprocessing.application;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.processor.orderprocessing.application.command.CancelOrderCommand;
 import com.processor.orderprocessing.application.command.CreateOrderCommand;
 import com.processor.orderprocessing.application.event.OutboxEvent;
@@ -11,8 +12,10 @@ import com.processor.orderprocessing.application.result.OrderResult;
 import com.processor.orderprocessing.application.view.OrderHistoryView;
 import com.processor.orderprocessing.application.view.OrderView;
 import com.processor.orderprocessing.application.view.PagedOrderView;
+import com.processor.orderprocessing.domain.domainEnum.OrderStatus;
 import com.processor.orderprocessing.domain.exception.OrderNotFoundException;
 import com.processor.orderprocessing.domain.model.Order;
+import com.processor.orderprocessing.messaging.event.OrderReceivedEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -29,6 +32,7 @@ public class OrderProcessingService implements OrderProcessingUseCase {
     private final ProcessedRequestRepository processedRequestRepository;
     private final OrderValidator orderValidator;
     private final OutboxRepository outboxRepository;
+    private final ObjectMapper objectMapper;
 
     @Override
     public OrderResult process(CreateOrderCommand command) {
@@ -50,8 +54,28 @@ public class OrderProcessingService implements OrderProcessingUseCase {
 
         processedRequestRepository.save(command.getRequestId());
 
+        OrderReceivedEvent event =
+                new OrderReceivedEvent(
+                        savedOrder.getId().toString(),
+                        savedOrder.getCustomerId(),
+                        savedOrder.getStatus().name()
+                );
+
+        String payload;
+        try {
+            payload = objectMapper.writeValueAsString(event);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to serialize OrderReceivedEvent", e);
+        }
+
+
         outboxRepository.save(
-                OutboxEvent.orderReceived(savedOrder)
+                new OutboxEvent(
+                        "ORDER",
+                        savedOrder.getId().toString(),
+                        "ORDER_RECEIVED",
+                        payload
+                )
         );
 
         return OrderResult.success(
@@ -97,10 +121,6 @@ public class OrderProcessingService implements OrderProcessingUseCase {
 
         processedRequestRepository.save(command.getRequestId());
 
-        outboxRepository.save(
-                OutboxEvent.orderCancelled(updatedOrder)
-        );
-
         return OrderResult.success(
                 updatedOrder.getId(),
                 updatedOrder.getStatus(),
@@ -118,5 +138,15 @@ public class OrderProcessingService implements OrderProcessingUseCase {
         return OrderHistoryView.from(order);
     }
 
+    @Override
+    public void updateOrderStatus(UUID orderId, OrderStatus status) {
+
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("Order not found"));
+
+        order.updateStatus(status);
+
+        orderRepository.save(order);
+    }
 
 }

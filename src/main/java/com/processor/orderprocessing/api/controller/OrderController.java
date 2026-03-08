@@ -51,7 +51,7 @@ public class OrderController {
                 .body(orderApiMapper.toCreateOrderResponse(result));
     }
 
-    @GetMapping
+    @GetMapping("/{orderId}")
     public ResponseEntity<OrderResponse> getOrderByid(
             @PathVariable UUID orderId,
             @RequestHeader("X-Correlation-Id") String correlationId

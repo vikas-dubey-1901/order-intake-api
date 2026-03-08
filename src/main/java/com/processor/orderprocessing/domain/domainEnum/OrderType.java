@@ -1,4 +1,7 @@
 package com.processor.orderprocessing.domain.domainEnum;
 
-public class OrderType {
+public enum OrderType {
+    ONLINE,
+    OFFLINE
 }
+

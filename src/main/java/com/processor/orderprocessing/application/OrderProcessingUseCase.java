@@ -6,6 +6,7 @@ import com.processor.orderprocessing.application.result.OrderResult;
 import com.processor.orderprocessing.application.view.OrderHistoryView;
 import com.processor.orderprocessing.application.view.OrderView;
 import com.processor.orderprocessing.application.view.PagedOrderView;
+import com.processor.orderprocessing.domain.domainEnum.OrderStatus;
 
 import java.util.UUID;
 
@@ -20,4 +21,6 @@ public interface OrderProcessingUseCase {
     OrderResult cancel(CancelOrderCommand command);
 
     OrderHistoryView getOrderHistory(UUID orderId);
+
+    void updateOrderStatus(UUID orderId, OrderStatus status);
 }

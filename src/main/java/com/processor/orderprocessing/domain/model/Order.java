@@ -129,6 +129,16 @@ public class Order {
         );
     }
 
+    public void updateStatus(OrderStatus newStatus) {
+
+        if (this.status == OrderStatus.APPROVED ||
+                this.status == OrderStatus.REJECTED) {
+            throw new IllegalStateException("Order already finalized");
+        }
+
+        this.status = newStatus;
+    }
+
 
 
 }

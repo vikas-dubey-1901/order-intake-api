@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.AccessLevel;
 
 import java.time.Instant;
+import java.util.UUID;
 
 @Entity
 @Table(name = "outbox_events")
